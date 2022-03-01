@@ -4,43 +4,87 @@
 <head>
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
     <script src="./Genome.js"></script>
     <script src="./Dot.js"></script>
     <script src="./Brain.js"></script>
 </head>
 
 <body>
-    <div id="status"></div>
-    <div id="end"></div>
+    <style>
+        #status {
+            position: absolute;
+            left: 650px;
+            height: 600px;
+            width: 600px;
+            border: 1px solid black;
+        }
+    </style>
     <script>
         let dots = []
-        let mapp = new Array(100).fill(new Array(100).fill(0))
-        
+        let mapp = []
+        for (let i = 0; i < 100; i++) {
+            mapp.push([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+        }
+
         function setup() {
             createCanvas(600, 600)
             // slider = createSlider(0, 255, 100);
             // slider.position(710, 10);
             // slider.style('width', '80px');
             for (let i = 0; i < 10; i++) {
-                dots[i] = new Dot(4, 50, 45 + i, 1)
+                if (i == 0) {
+                    dots[i] = new Dot(4, 50, 45 + i, 1, true)
+                } else {
+
+                    dots[i] = new Dot(4, 50, 45 + i, 1, false)
+                }
                 mapp[dots[i].pos.y][dots[i].pos.x] = 1
             }
-            frameRate(2)
+            frameRate(30)
         }
 
         function draw() {
             background(225)
             noStroke()
             for (let i = 0; i < dots.length; i++) {
-                console.log(i, dots[i].pos.x, dots[i].pos.y, "b")
                 mapp[dots[i].pos.y][dots[i].pos.x] = 0
-                dots[i].move(mapp, 2)//Math.floor(Math.random() * 4))
-                mapp[dots[i].pos.y][dots[i].pos.x] = 1
-                console.log(i, dots[i].pos.x, dots[i].pos.y, "a")
+                d = dots[i].move()//Math.floor(Math.random() * 4))
+                m = checkmove(mapp, dots[i].pos.x, dots[i].pos.y, d)
+                mapp[m[1]][m[0]] = 1
+                dots[i].pos.x = m[0]
+                dots[i].pos.y = m[1]
                 dots[i].draw()
             }
         }
+
+        function checkmove(m, x, y, dir) {
+            switch (dir) {
+                case 0:
+                    if (x != mapp.length - 1 && mapp[y][x + 1] == 0) {
+                        x += 1
+                    }
+                    break;
+                case 1:
+                    if (x != 0 && mapp[y][x - 1] == 0) {
+                        x -= 1
+                    }
+                    break;
+                case 2:
+                    if (y != mapp.length - 1 && mapp[y + 1][x] == 0) {
+                        y += 1
+                    }
+                    break;
+                case 3:
+                    if (y != 0 && mapp[y - 1][x] == 0) {
+                        y -= 1
+                    }
+                    break;
+            }
+            return [x, y]
+        }
     </script>
+    <div id="status"></div>
 </body>
 
 </html>
