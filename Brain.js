@@ -15,35 +15,34 @@ class Brain {
                 { id: 10, group: 'inp', label: 'Lx' }, //x location
                 { id: 11, group: 'inp', label: 'Ly' }, //y location
                 { id: 12, group: 'inp', label: 'Bd' }, //Closest border
-                { id: 13, group: 'inp', label: 'Gen' }, //Genetic similarity of forward neighbor
-                { id: 14, group: 'inp', label: 'PLd' }, //Distance to closest plant
-                { id: 15, group: 'inp', label: 'Eng' }, //Energy
-                { id: 16, group: 'inp', label: 'DEg' }, //Change in energy from last turn
-                { id: 17, group: 'inp', label: 'Pdf' }, //Plant density forwards
-                { id: 18, group: 'inp', label: 'Osc' }, //Oscillator
-                { id: 19, group: 'inp', label: 'PiD' }, //Plants within 5 moves
-                { id: 20, group: 'inp', label: 'PDy' }, //Plant distance y
-                { id: 21, group: 'inp', label: 'PDx' }, //Plant distance x
-                { id: 22, group: 'hid', label: 'N0' }, //Hidden node 0
-                { id: 23, group: 'hid', label: 'N1' }, //Hidden node 1
-                { id: 24, group: 'hid', label: 'N2' }, //Hidden node 2
-                { id: 25, group: 'hid', label: 'N3' }, //Hidden node 3
-                { id: 26, group: 'hid', label: 'N4' }, //Hidden node 4
-                { id: 27, group: 'hid', label: 'N5' }, //Hidden node 5
-                { id: 28, group: 'hid', label: 'N6' }, //Hidden node 6
-                { id: 29, group: 'hid', label: 'N7' }, //Hidden node 7
-                { id: 30, group: 'hid', label: 'N8' }, //Hidden node 8
-                { id: 31, group: 'hid', label: 'N9' }, //Hidden node 9
-                { id: 32, group: 'out', label: 'OSC' }, //Set oscillator period
-                { id: 33, group: 'out', label: 'Mfd' }, //Move forwards
-                { id: 34, group: 'out', label: 'Mrn' }, //Move random
-                { id: 35, group: 'out', label: 'Mrv' }, //Move reverse
-                { id: 36, group: 'out', label: 'Mx' }, //Move x
-                { id: 37, group: 'out', label: 'My' }, //Move y
-                { id: 38, group: 'out', label: 'Mrl' }, //Move left/right
-                { id: 39, group: 'out', label: 'Plt' }, //Plant forwards
-                { id: 40, group: 'out', label: 'NON' }, //Do nothing
-                { id: 41, group: 'out', label: 'Spn' }, //Spawn offspring forwards
+                { id: 13, group: 'inp', label: 'PLd' }, //Distance to closest plant
+                { id: 14, group: 'inp', label: 'Eng' }, //Energy
+                { id: 15, group: 'inp', label: 'DEg' }, //Change in energy from last turn
+                { id: 16, group: 'inp', label: 'Pdf' }, //Plant density forwards
+                { id: 17, group: 'inp', label: 'Osc' }, //Oscillator
+                { id: 18, group: 'inp', label: 'PiD' }, //Plants within 5 moves
+                { id: 19, group: 'inp', label: 'PDy' }, //Plant distance y
+                { id: 20, group: 'inp', label: 'PDx' }, //Plant distance x
+                { id: 21, group: 'hid', label: 'N0' }, //Hidden node 0
+                { id: 22, group: 'hid', label: 'N1' }, //Hidden node 1
+                { id: 23, group: 'hid', label: 'N2' }, //Hidden node 2
+                { id: 24, group: 'hid', label: 'N3' }, //Hidden node 3
+                { id: 25, group: 'hid', label: 'N4' }, //Hidden node 4
+                { id: 26, group: 'hid', label: 'N5' }, //Hidden node 5
+                { id: 27, group: 'hid', label: 'N6' }, //Hidden node 6
+                { id: 28, group: 'hid', label: 'N7' }, //Hidden node 7
+                { id: 29, group: 'hid', label: 'N8' }, //Hidden node 8
+                { id: 30, group: 'hid', label: 'N9' }, //Hidden node 9
+                { id: 31, group: 'out', label: 'OSC' }, //Set oscillator period
+                { id: 32, group: 'out', label: 'Mfd' }, //Move forwards
+                { id: 33, group: 'out', label: 'Mrn' }, //Move random
+                { id: 34, group: 'out', label: 'Mrv' }, //Move reverse
+                { id: 35, group: 'out', label: 'Mx' }, //Move x
+                { id: 36, group: 'out', label: 'My' }, //Move y
+                { id: 37, group: 'out', label: 'Mrl' }, //Move left/right
+                { id: 38, group: 'out', label: 'Plt' }, //Plant forwards
+                { id: 39, group: 'out', label: 'NON' }, //Do nothing
+                { id: 40, group: 'out', label: 'Spn' }, //Spawn offspring forwards
             ]
 
             var nodes = new vis.DataSet([]);
@@ -52,14 +51,14 @@ class Brain {
                 let ton = 0
                 let from = 0
                 if (decoded[i][0] == 1) {
-                    from = (decoded[i][1] % hidden) + 21
+                    from = (decoded[i][1] % hidden) + 20
                 } else {
-                    from = (decoded[i][1] % 21)
+                    from = (decoded[i][1] % 20)
                 }
                 if (decoded[i][2] == 1) {
-                    ton = (decoded[i][3] % hidden) + 21
+                    ton = (decoded[i][3] % hidden) + 20
                 } else {
-                    ton = (decoded[i][3] % 10) + 31
+                    ton = (decoded[i][3] % 10) + 30
                 }
                 nodes.update(pnodes[ton])
                 nodes.update(pnodes[from])
