@@ -1,13 +1,16 @@
 class Dot {
-    constructor(glength, sx, sy, h, sb) {
+    constructor(glength, sx, sy, h) {
+        this.dead = false
         this.genome = new Genome()
         this.genome.generate(glength)
         this.pos = createVector(sx, sy)
-        this.lpos = createVector(0, 0)
+        this.lposx = 0
+        this.lposy = 0
         this.energy = 100
         this.lenergy = 0
-        this.dir = 1
-        this.brain = new Brain(this.genome.decode(), h, sb)
+        this.dir = 4
+        this.moved = 4
+        this.brain = new Brain(this.genome.decode(), h)
         this.period = Math.random() * 2 - 1
         let s = this.genome.s.replace(/\s/g, "")
         let l = Math.round(s.length / 3)
@@ -15,28 +18,7 @@ class Dot {
         this.r = (parseInt(s.substring(0, l), 16) % 150) + 50
         this.g = (parseInt(s.substring(l, l2), 16) % 150) + 50
         this.b = (parseInt(s.substring(l2, s.length), 16) % 150) + 50
-        this.data = {
-            age: 0,
-            rnd: 0,
-            pfd: 0,
-            plr: 0,
-            lpf: 0,
-            lmy: 0,
-            lmx: 0,
-            bdy: 0,
-            bdx: 0,
-            lx: 0,
-            ly: 0,
-            bd: 0,
-            pld: 0,
-            eng: 0,
-            deg: 0,
-            pdf: 0,
-            osc: 0,
-            pid: 0,
-            pdy: 0,
-            pdx: 0
-        }
+        this.data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     }
 
     draw() {
@@ -44,30 +26,99 @@ class Dot {
         ellipse(this.pos.x * 6 + 3, this.pos.y * 6 + 3, 6)
     }
 
-    move() {
-        this.lpos = this.pos
-        return Math.floor(Math.random() * 4)
+    action() {
+        this.lenergy = this.energy
+        this.lposx = this.pos.x
+        this.lposy = this.pos.y
+        let choice = this.brain.getoutput(this.data)
+        switch (choice[0]) {
+            case 0: //OSC
+                this.period = choice[1]
+                break;
+            case 1: //Mfd
+                this.moved = this.dir
+                this.energy--
+                break;
+            case 2: //Mrn
+                this.moved = Math.floor(Math.random() * 4)
+                this.energy--
+                break;
+            case 3: //Mrv
+                this.moved = (this.dir + 2) % 4
+                this.energy--
+                break;
+            case 4: //Mx-
+                this.moved = 2
+                this.energy--
+                break;
+            case 5: //Mx+
+                this.moved = 0
+                this.energy--
+                break;
+            case 6: //My-
+                this.moved = 3
+                this.energy--
+                break;
+            case 7: //My+
+                this.moved = 1
+                this.energy--
+                break;
+            case 8: //ML
+                this.moved = (this.dir - 1) % 4
+                this.energy--
+                break;
+            case 9: //MR
+                this.moved = (this.dir + 1) % 4
+                this.energy--
+                break;
+            case 10: //Plt
+                console.log("PLANT")
+                this.energy--
+                break;
+            case 11: //NON
+                console.log("nothing")
+                break;
+            case 12: //Spn
+                console.log("spawn")
+                this.energy -= 50
+                break;
+            case 13: //Eat
+                this.energy += 20
+                console.log("eat plant")
+                break;
+
+        }
+    }
+
+    showbrain() {
+        this.brain.show()
     }
 
     update(mapp) {
-        this.data.age++
-        this.data.rnd = Math.random() * 2 - 1
-        this.data.lmy = this.pos.y = this.lpos.y
-        this.data.lmx = this.pos.x = this.lpos.x
+        if (this.energy <= 0){
+            this.dead = true
+        }
+        this.moved = 0
+        this.data[0] += 0.001 //age
+        this.data[1] = Math.random() * 2 - 1 //random
+        this.data[5] = this.pos.y - this.lposy //lmy
+        this.data[6] = this.pos.x - this.lposx //lmx
+        this.data[9] = this.pos.x / 100 //lx
+        this.data[10] = this.pos.y / 100 //ly
         if (this.pos.y > 50) {
-            this.data.bdy = 100 - this.pos.y
+            this.data[7] = (100 - this.pos.y) / 100 //bdy
         } else {
-            this.data.bdy = this.pos.y
+            this.data[7] = this.pos.y / 100 //bdy
         }
         if (this.pos.x > 50) {
-            this.data.bdx = 100 - this.pos.x
+            this.data[8] = (100 - this.pos.x) / 100 //bdx
         } else {
-            this.data.bdx = this.pos.x
+            this.data[8] = this.pos.x / 100 //bdx
         }
-        this.data.bd = min(this.data.bdx, this.data.bdy)
-        this.data.ocs = Math.sin(this.data.age * this.period)
-        this.data.eng = this.energy
-        this.data.deg = this.energy - this.lenergy
+        this.data[11] = min(this.data[7], this.data[8]) //bd
+        this.data[16] = Math.sin(this.data[0] * this.period * 100) //osc
+        this.data[13] = this.energy / 100 //eng
+        this.data[14] = (this.energy - this.lenergy) / 100 //deg
         //Switch per direction
         let shortot = 0
         let plantoc = 0
@@ -77,6 +128,9 @@ class Dot {
         let LRot = 0
         let LRoc = 0
         switch (this.dir) {
+            //   3
+            //  2+0
+            //   1
             case 0:
                 //mapp[y][x + 1]
                 //Short(10), Long(40), and Plant(10) densities
@@ -109,25 +163,104 @@ class Dot {
                 }
                 break;
             case 1:
-                if (x != 0 && mapp[y][x - 1] == 0) {
-                    x -= 1
+                //mapp[y + 1][x]
+                //Short(10), Long(40), and Plant(10) densities
+                for (let i = 0; i < 40; i++) {
+                    if (this.pos.y + i + 1 <= 99) {
+                        if (i < 10) {
+                            shortot++
+                            if (mapp[this.pos.y + 1 + i][this.pos.x] == 1) {
+                                shortoc++
+                            }
+                            if (mapp[this.pos.y + 1 + i][this.pos.x] == 2) {
+                                plantoc++
+                            }
+                        }
+                        longot++
+                        if (mapp[this.pos.y + 1 + i][this.pos.x] == 1) {
+                            longoc++
+                        }
+                    }
+                }
+
+                //Left(5) and Right(5) densities
+                for (let i = -5; i < 6; i++) {
+                    if (this.pos.x + i <= 99 && this.pos.x + i >= 0 && i != 0) {
+                        LRot++
+                        if (mapp[this.pos.y][this.pos.x + i] == 1) {
+                            LRoc++
+                        }
+                    }
                 }
                 break;
+
             case 2:
-                if (y != mapp.length - 1 && mapp[y + 1][x] == 0) {
-                    y += 1
+                //mapp[y][x - 1]
+                //Short(10), Long(40), and Plant(10) densities
+                for (let i = 0; i < 40; i++) {
+                    if (this.pos.x - i - 1 >= 0) {
+                        if (i < 10) {
+                            shortot++
+                            if (mapp[this.pos.y][this.pos.x - 1 - i] == 1) {
+                                shortoc++
+                            }
+                            if (mapp[this.pos.y][this.pos.x - 1 - i] == 2) {
+                                plantoc++
+                            }
+                        }
+                        longot++
+                        if (mapp[this.pos.y][this.pos.x - 1 - i] == 1) {
+                            longoc++
+                        }
+                    }
+                }
+
+                //Left(5) and Right(5) densities
+                for (let i = -5; i < 6; i++) {
+                    if (this.pos.y + i <= 99 && this.pos.y + i >= 0 && i != 0) {
+                        LRot++
+                        if (mapp[this.pos.y + i][this.pos.x] == 1) {
+                            LRoc++
+                        }
+                    }
                 }
                 break;
             case 3:
-                if (y != 0 && mapp[y - 1][x] == 0) {
-                    y -= 1
+                //mapp[y - 1][x]
+                //Short(10), Long(40), and Plant(10) densities
+                for (let i = 0; i < 40; i++) {
+                    if (this.pos.y - i - 1 >= 0) {
+                        if (i < 10) {
+                            shortot++
+                            if (mapp[this.pos.y - 1 - i][this.pos.x] == 1) {
+                                shortoc++
+                            }
+                            if (mapp[this.pos.y - 1 - i][this.pos.x] == 2) {
+                                plantoc++
+                            }
+                        }
+                        longot++
+                        if (mapp[this.pos.y - 1 - i][this.pos.x] == 1) {
+                            longoc++
+                        }
+                    }
+                }
+
+                //Left(5) and Right(5) densities
+                for (let i = -5; i < 6; i++) {
+                    if (this.pos.x + i <= 99 && this.pos.x + i >= 0 && i != 0) {
+                        LRot++
+                        if (mapp[this.pos.y][this.pos.x + i] == 1) {
+                            LRoc++
+                        }
+                    }
                 }
                 break;
         }
-        this.data.pfd = shortoc / shortot
-        this.data.pdf = plantoc / shortot
-        this.data.lpf = longoc / longot
-        this.data.pfd = LRoc / LRot
+        this.data[2] = shortoc / shortot //pfd
+        this.data[15] = plantoc / shortot //pdf
+        this.data[4] = longoc / longot //lpf
+        this.data[3] = LRoc / LRot //plr
         let ptot = 0
         let dy = 100
         let dx = 100
@@ -135,7 +268,7 @@ class Dot {
             if (mapp[this.pos.y][i] == 2) {
                 if (Math.abs(i - this.pos.x) < dx) {
                     dx = Math.abs(i - this.pos.x)
-                    this.data.pdx = i - this.pos.x
+                    this.data[19] = i - this.pos.x //pdx
                 }
                 if (i - this.pos.x < 6 && i - this.pos.x > -6) {
                     ptot++
@@ -146,13 +279,14 @@ class Dot {
             if (mapp[i][this.pos.x] == 2) {
                 if (Math.abs(i - this.pos.y) < dy) {
                     dy = Math.abs(i - this.pos.y)
-                    this.data.pdy = i - this.pos.y
+                    this.data[18] = i - this.pos.y //pdy
                 }
                 if (i - this.pos.y < 6 && i - this.pos.y > -6) {
                     ptot++
                 }
             }
         }
-        this.data.pid = ptot
+        this.data[12] = min(this.data[18], this.data[19])
+        this.data[17] = ptot //pid
     }
 }

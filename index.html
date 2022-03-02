@@ -32,15 +32,11 @@
             // slider = createSlider(0, 255, 100);
             // slider.position(710, 10);
             // slider.style('width', '80px');
-            for (let i = 0; i < 10; i++) {
-                if (i == 0) {
-                    dots[i] = new Dot(15, 50, 45 + i, 3, true)
-                } else {
-
-                    dots[i] = new Dot(4, 50, 45 + i, 1, false)
-                }
+            for (let i = 0; i < 200; i++) {
+                dots[i] = new Dot(4, Math.floor(Math.random()*100), Math.floor(Math.random()*100), 1)
                 mapp[dots[i].pos.y][dots[i].pos.x] = 1
             }
+            dots[1].showbrain()
             frameRate(30)
         }
 
@@ -48,17 +44,26 @@
             background(225)
             noStroke()
             for (let i = 0; i < dots.length; i++) {
-                mapp[dots[i].pos.y][dots[i].pos.x] = 0
-                d = dots[i].move()//Math.floor(Math.random() * 4))
-                m = checkmove(mapp, dots[i].pos.x, dots[i].pos.y, d)
-                mapp[m[1]][m[0]] = 1
-                dots[i].pos.x = m[0]
-                dots[i].pos.y = m[1]
-                dots[i].draw()
+
+                dots[i].update(mapp)
+                dots[i].action()
+                d = dots[i].moved
+                if (d != 4) {
+                    mapp[dots[i].pos.y][dots[i].pos.x] = 0
+                    m = checkmove(mapp, dots[i].pos.x, dots[i].pos.y, d)
+                    mapp[m[1]][m[0]] = 1
+                    dots[i].pos.x = m[0]
+                    dots[i].pos.y = m[1]
+                    dots[i].draw()
+                    dots[i].dir = dots[i].moved
+                }
             }
         }
 
         function checkmove(m, x, y, dir) {
+            //   3
+            //  2+0
+            //   1
             switch (dir) {
                 case 0:
                     if (x != mapp.length - 1 && mapp[y][x + 1] == 0) {
@@ -66,19 +71,21 @@
                     }
                     break;
                 case 1:
-                    if (x != 0 && mapp[y][x - 1] == 0) {
-                        x -= 1
+                    if (y != mapp.length - 1 && mapp[y + 1][x] == 0) {
+                        y += 1
                     }
                     break;
                 case 2:
-                    if (y != mapp.length - 1 && mapp[y + 1][x] == 0) {
-                        y += 1
+                    if (x != 0 && mapp[y][x - 1] == 0) {
+                        x -= 1
                     }
                     break;
                 case 3:
                     if (y != 0 && mapp[y - 1][x] == 0) {
                         y -= 1
                     }
+                    break;
+                case 4:
                     break;
             }
             return [x, y]
