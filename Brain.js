@@ -38,11 +38,14 @@ class Brain {
         }
 
         // tanh all the output values
+        let nzero = []
         for (let i = 0; i < 13; i++){
             out[i] = Math.tanh(out[i])
+            if (out[i] != 0) {
+                nzero.push(out[i])
+            }
         }
-
-        return [out.indexOf(max(out)), max(out)]
+        return [out.indexOf(max(nzero)), max(nzero)]
     }
 
     show() {

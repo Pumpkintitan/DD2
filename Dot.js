@@ -8,7 +8,7 @@ class Dot {
         this.lposy = 0
         this.energy = 100
         this.lenergy = 0
-        this.dir = 4
+        this.dir = 3
         this.moved = 4
         this.brain = new Brain(this.genome.decode(), h)
         this.period = Math.random() * 2 - 1
@@ -27,9 +27,11 @@ class Dot {
     }
 
     action() {
+        console.log(this.data[17], this.data[12])
         this.lenergy = this.energy
         this.lposx = this.pos.x
         this.lposy = this.pos.y
+        this.energy--
         let choice = this.brain.getoutput(this.data)
         switch (choice[0]) {
             case 0: //OSC
@@ -98,7 +100,7 @@ class Dot {
         if (this.energy <= 0){
             this.dead = true
         }
-        this.moved = 0
+        this.moved = 4
         this.data[0] += 0.001 //age
         this.data[1] = Math.random() * 2 - 1 //random
         this.data[5] = this.pos.y - this.lposy //lmy
@@ -257,10 +259,25 @@ class Dot {
                 }
                 break;
         }
-        this.data[2] = shortoc / shortot //pfd
-        this.data[15] = plantoc / shortot //pdf
-        this.data[4] = longoc / longot //lpf
-        this.data[3] = LRoc / LRot //plr
+        if (shortot != 0) {
+            this.data[2] = shortoc / shortot //pfd
+            this.data[15] = plantoc / shortot //pdf
+        } else {
+            this.data[2] = 0 //pfd
+            this.data[15] = 0 //pdf
+        }
+
+        if (longot != 0) {
+            this.data[4] = longoc / longot //lpf
+        } else {
+            this.data[4] = 0 //lpf
+        }
+           
+        if (LRot != 0) {
+            this.data[3] = LRoc / LRot //plr
+        } else {
+            this.data[3] = 0 //plr
+        }
         let ptot = 0
         let dy = 100
         let dx = 100

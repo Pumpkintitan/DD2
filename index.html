@@ -26,36 +26,48 @@
         for (let i = 0; i < 100; i++) {
             mapp.push([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
         }
+        for (let i = 0; i < 100; i++) {
+            mapp[Math.floor(Math.random()*100)][Math.floor(Math.random()*100)] = 2
+        }
 
         function setup() {
             createCanvas(600, 600)
             // slider = createSlider(0, 255, 100);
             // slider.position(710, 10);
             // slider.style('width', '80px');
-            for (let i = 0; i < 200; i++) {
-                dots[i] = new Dot(4, Math.floor(Math.random()*100), Math.floor(Math.random()*100), 1)
+            for (let i = 0; i < 1; i++) {
+                dots[i] = new Dot(6, Math.floor(Math.random()*100), Math.floor(Math.random()*100), 2)
                 mapp[dots[i].pos.y][dots[i].pos.x] = 1
             }
-            dots[1].showbrain()
-            frameRate(30)
+            dots[0].showbrain()
+            frameRate(1)
         }
 
         function draw() {
             background(225)
             noStroke()
+            for (let i = 0; i < 100; i++) {
+                for (let j = 0; j < 100; j++) {
+                    if (mapp[i][j] == 2){
+                        fill(0,100,0)
+                        rect(i*6, j*6, 6, 6)
+                    }
+                }
+            }
             for (let i = 0; i < dots.length; i++) {
-
-                dots[i].update(mapp)
-                dots[i].action()
-                d = dots[i].moved
-                if (d != 4) {
-                    mapp[dots[i].pos.y][dots[i].pos.x] = 0
-                    m = checkmove(mapp, dots[i].pos.x, dots[i].pos.y, d)
-                    mapp[m[1]][m[0]] = 1
-                    dots[i].pos.x = m[0]
-                    dots[i].pos.y = m[1]
+                if (!dots[i].dead) {
+                    dots[i].update(mapp)
+                    dots[i].action()
+                    d = dots[i].moved
                     dots[i].draw()
-                    dots[i].dir = dots[i].moved
+                    if (d != 4) {
+                        mapp[dots[i].pos.y][dots[i].pos.x] = 0
+                        m = checkmove(mapp, dots[i].pos.x, dots[i].pos.y, d)
+                        mapp[m[1]][m[0]] = 1
+                        dots[i].pos.x = m[0]
+                        dots[i].pos.y = m[1]
+                        dots[i].dir = dots[i].moved
+                    }
                 }
             }
         }
