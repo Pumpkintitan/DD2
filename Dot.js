@@ -21,9 +21,9 @@ class Dot {
         this.data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     }
 
-    draw() {
+    draw(G) {
         fill(this.r, this.g, this.b)
-        ellipse(this.pos.x * 6 + 3, this.pos.y * 6 + 3, 6)
+        ellipse(this.pos.x * ((100/GRID) * 6) + ((100/GRID) * 3), this.pos.y * ((100/GRID) * 6) + ((100/GRID) * 3), ((100/GRID) * 6))
     }
 
     action() {
@@ -107,13 +107,13 @@ class Dot {
         this.data[6] = this.pos.x - this.lposx //lmx
         this.data[9] = this.pos.x / 100 //lx
         this.data[10] = this.pos.y / 100 //ly
-        if (this.pos.y > 50) {
-            this.data[7] = (100 - this.pos.y) / 100 //bdy
+        if (this.pos.y > (mapp.length/2)) {
+            this.data[7] = (mapp.length - this.pos.y) / 100 //bdy
         } else {
             this.data[7] = this.pos.y / 100 //bdy
         }
-        if (this.pos.x > 50) {
-            this.data[8] = (100 - this.pos.x) / 100 //bdx
+        if (this.pos.x > (mapp.length/2)) {
+            this.data[8] = (mapp.length - this.pos.x) / 100 //bdx
         } else {
             this.data[8] = this.pos.x / 100 //bdx
         }
@@ -137,7 +137,7 @@ class Dot {
                 //mapp[y][x + 1]
                 //Short(10), Long(40), and Plant(10) densities
                 for (let i = 0; i < 40; i++) {
-                    if (this.pos.x + i + 1 <= 99) {
+                    if (this.pos.x + i + 1 <= (mapp.length - 1)) {
                         if (i < 10) {
                             shortot++
                             if (mapp[this.pos.y][this.pos.x + 1 + i] == 1) {
@@ -156,7 +156,7 @@ class Dot {
 
                 //Left(5) and Right(5) densities
                 for (let i = -5; i < 6; i++) {
-                    if (this.pos.y + i <= 99 && this.pos.y + i >= 0 && i != 0) {
+                    if (this.pos.y + i <= (mapp.length - 1) && this.pos.y + i >= 0 && i != 0) {
                         LRot++
                         if (mapp[this.pos.y + i][this.pos.x] == 1) {
                             LRoc++
@@ -168,7 +168,7 @@ class Dot {
                 //mapp[y + 1][x]
                 //Short(10), Long(40), and Plant(10) densities
                 for (let i = 0; i < 40; i++) {
-                    if (this.pos.y + i + 1 <= 99) {
+                    if (this.pos.y + i + 1 <= (mapp.length - 1)) {
                         if (i < 10) {
                             shortot++
                             if (mapp[this.pos.y + 1 + i][this.pos.x] == 1) {
@@ -187,7 +187,7 @@ class Dot {
 
                 //Left(5) and Right(5) densities
                 for (let i = -5; i < 6; i++) {
-                    if (this.pos.x + i <= 99 && this.pos.x + i >= 0 && i != 0) {
+                    if (this.pos.x + i <= (mapp.length - 1) && this.pos.x + i >= 0 && i != 0) {
                         LRot++
                         if (mapp[this.pos.y][this.pos.x + i] == 1) {
                             LRoc++
@@ -219,7 +219,7 @@ class Dot {
 
                 //Left(5) and Right(5) densities
                 for (let i = -5; i < 6; i++) {
-                    if (this.pos.y + i <= 99 && this.pos.y + i >= 0 && i != 0) {
+                    if (this.pos.y + i <= (mapp.length - 1) && this.pos.y + i >= 0 && i != 0) {
                         LRot++
                         if (mapp[this.pos.y + i][this.pos.x] == 1) {
                             LRoc++
@@ -250,7 +250,7 @@ class Dot {
 
                 //Left(5) and Right(5) densities
                 for (let i = -5; i < 6; i++) {
-                    if (this.pos.x + i <= 99 && this.pos.x + i >= 0 && i != 0) {
+                    if (this.pos.x + i <= (mapp.length - 1) && this.pos.x + i >= 0 && i != 0) {
                         LRot++
                         if (mapp[this.pos.y][this.pos.x + i] == 1) {
                             LRoc++
@@ -279,9 +279,9 @@ class Dot {
             this.data[3] = 0 //plr
         }
         let ptot = 0
-        let dy = 100
-        let dx = 100
-        for (let i = 0; i < 100; i++) {
+        let dy = mapp.length
+        let dx = mapp.length
+        for (let i = 0; i < mapp.length; i++) {
             if (mapp[this.pos.y][i] == 2) {
                 if (Math.abs(i - this.pos.x) < dx) {
                     dx = Math.abs(i - this.pos.x)
@@ -292,7 +292,7 @@ class Dot {
                 }
             }
         }
-        for (let i = 0; i < 100; i++) {
+        for (let i = 0; i < mapp.length; i++) {
             if (mapp[i][this.pos.x] == 2) {
                 if (Math.abs(i - this.pos.y) < dy) {
                     dy = Math.abs(i - this.pos.y)

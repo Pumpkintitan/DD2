@@ -24,12 +24,18 @@
         let dots = []
         let mapp = []
         let pv = 0
-        const DOTS = 50
-        for (let i = 0; i < 100; i++) {
-            mapp.push([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+        let frame = 0
+        const DOTS = 1
+        const GRID = 10
+        const PLANTS = 30
+        for (let i = 0; i < GRID; i++) {
+            mapp[i] = []
+            for (let j = 0; j < GRID; j++) {
+                mapp[i].push(0)
+            }
         }
-        for (let i = 0; i < 100; i++) {
-            mapp[Math.floor(Math.random() * 100)][Math.floor(Math.random() * 100)] = 2
+        for (let i = 0; i < PLANTS; i++) {
+            mapp[Math.floor(Math.random() * GRID)][Math.floor(Math.random() * GRID)] = 2
         }
 
         function setup() {
@@ -38,7 +44,7 @@
             slider.position(650, 620);
             slider.style('width', '600px');
             for (let i = 0; i < DOTS; i++) {
-                dots[i] = new Dot(10, Math.floor(Math.random() * 100), Math.floor(Math.random() * 100), 2)
+                dots[i] = new Dot(2, Math.floor(Math.random() * GRID), Math.floor(Math.random() * GRID), 1)
                 mapp[dots[i].pos.y][dots[i].pos.x] = 1
             }
             dots[0].showbrain()
@@ -54,20 +60,24 @@
             noStroke()
             fill(225)
             rect(0, 0, 600, 600)
-            for (let i = 0; i < 100; i++) {
-                for (let j = 0; j < 100; j++) {
+            let dts = 0
+            let p = 0
+            for (let i = 0; i < GRID; i++) {
+                for (let j = 0; j < GRID; j++) {
                     if (mapp[i][j] == 2) {
-                        fill(200, 255, 200)
-                        rect(i * 6, j * 6, 6, 6)
+                        p ++
+                        fill(0, 100, 0)
+                        rect(j * ((100/GRID) * 6), i * ((100/GRID) * 6), ((100/GRID) * 6), ((100/GRID) * 6))
                     }
                 }
             }
             for (let i = 0; i < dots.length; i++) {
                 if (!dots[i].dead) {
+                    dts ++
                     dots[i].update(mapp)
                     dots[i].action()
                     d = dots[i].moved
-                    dots[i].draw()
+                    dots[i].draw(GRID)
                     if (d != 4) {
                         mapp[dots[i].pos.y][dots[i].pos.x] = 0
                         m = checkmove(mapp, dots[i].pos.x, dots[i].pos.y, d)
@@ -78,9 +88,13 @@
                     }
                 }
             }
+            frame ++
             fill(0)
-            textSize(32)
-            text(slider.value(), 700, 700)
+            textSize(28)
+            text(slider.value() + 1, 650, 700)
+            text(`Frame: ${frame}`, 10, 633)
+            text(`Creatures alive: ${dts}`, 10, 666)
+            text(`Plants alive: ${p}`, 10, 700)
         }
 
         function checkmove(m, x, y, dir) {
