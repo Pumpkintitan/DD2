@@ -23,11 +23,11 @@ class Dot {
 
     draw(G) {
         fill(this.r, this.g, this.b)
-        ellipse(this.pos.x * ((100/GRID) * 6) + ((100/GRID) * 3), this.pos.y * ((100/GRID) * 6) + ((100/GRID) * 3), ((100/GRID) * 6))
+        ellipse(this.pos.x * ((100 / G) * 6) + ((100 / G) * 3), this.pos.y * ((100 / G) * 6) + ((100 / G) * 3), ((100 / G) * 6))
     }
 
     action() {
-        console.log(this.data[17], this.data[12])
+        // console.log(this.data[17], this.data[12])
         this.lenergy = this.energy
         this.lposx = this.pos.x
         this.lposy = this.pos.y
@@ -36,58 +36,56 @@ class Dot {
         switch (choice[0]) {
             case 0: //OSC
                 this.period = choice[1]
-                break;
+                return 0
             case 1: //Mfd
                 this.moved = this.dir
                 this.energy--
-                break;
+                return 0
             case 2: //Mrn
                 this.moved = Math.floor(Math.random() * 4)
                 this.energy--
-                break;
+                return 0
             case 3: //Mrv
                 this.moved = (this.dir + 2) % 4
                 this.energy--
-                break;
+                return 0
             case 4: //Mx-
                 this.moved = 2
                 this.energy--
-                break;
+                return 0
             case 5: //Mx+
                 this.moved = 0
                 this.energy--
-                break;
+                return 0
             case 6: //My-
                 this.moved = 3
                 this.energy--
-                break;
+                return 0
             case 7: //My+
                 this.moved = 1
                 this.energy--
-                break;
+                return 0
             case 8: //ML
                 this.moved = (this.dir - 1) % 4
                 this.energy--
-                break;
+                return 0
             case 9: //MR
                 this.moved = (this.dir + 1) % 4
                 this.energy--
-                break;
+                return 0
             case 10: //Plt
-                console.log("PLANT")
                 this.energy--
-                break;
+                return 1
             case 11: //NON
-                console.log("nothing")
-                break;
+                return 0
             case 12: //Spn
                 console.log("spawn")
                 this.energy -= 50
-                break;
+                return 2
             case 13: //Eat
                 this.energy += 20
                 console.log("eat plant")
-                break;
+                return 3
 
         }
     }
@@ -97,7 +95,7 @@ class Dot {
     }
 
     update(mapp) {
-        if (this.energy <= 0){
+        if (this.energy <= 0) {
             this.dead = true
         }
         this.moved = 4
@@ -107,12 +105,12 @@ class Dot {
         this.data[6] = this.pos.x - this.lposx //lmx
         this.data[9] = this.pos.x / 100 //lx
         this.data[10] = this.pos.y / 100 //ly
-        if (this.pos.y > (mapp.length/2)) {
+        if (this.pos.y > (mapp.length / 2)) {
             this.data[7] = (mapp.length - this.pos.y) / 100 //bdy
         } else {
             this.data[7] = this.pos.y / 100 //bdy
         }
-        if (this.pos.x > (mapp.length/2)) {
+        if (this.pos.x > (mapp.length / 2)) {
             this.data[8] = (mapp.length - this.pos.x) / 100 //bdx
         } else {
             this.data[8] = this.pos.x / 100 //bdx
@@ -272,7 +270,7 @@ class Dot {
         } else {
             this.data[4] = 0 //lpf
         }
-           
+
         if (LRot != 0) {
             this.data[3] = LRoc / LRot //plr
         } else {

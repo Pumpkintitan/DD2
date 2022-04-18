@@ -27,7 +27,7 @@
         let frame = 0
         const DOTS = 1
         const GRID = 10
-        const PLANTS = 30
+        const PLANTS = 100
         for (let i = 0; i < GRID; i++) {
             mapp[i] = []
             for (let j = 0; j < GRID; j++) {
@@ -44,7 +44,7 @@
             slider.position(650, 620);
             slider.style('width', '600px');
             for (let i = 0; i < DOTS; i++) {
-                dots[i] = new Dot(2, Math.floor(Math.random() * GRID), Math.floor(Math.random() * GRID), 1)
+                dots[i] = new Dot(16, Math.floor(Math.random() * GRID), Math.floor(Math.random() * GRID), 1)
                 mapp[dots[i].pos.y][dots[i].pos.x] = 1
             }
             dots[0].showbrain()
@@ -65,18 +65,18 @@
             for (let i = 0; i < GRID; i++) {
                 for (let j = 0; j < GRID; j++) {
                     if (mapp[i][j] == 2) {
-                        p ++
+                        p++
                         fill(0, 100, 0)
-                        rect(j * ((100/GRID) * 6), i * ((100/GRID) * 6), ((100/GRID) * 6), ((100/GRID) * 6))
+                        rect(j * ((100 / GRID) * 6), i * ((100 / GRID) * 6), ((100 / GRID) * 6), ((100 / GRID) * 6))
                     }
                 }
             }
             for (let i = 0; i < dots.length; i++) {
                 if (!dots[i].dead) {
-                    dts ++
+                    dts++
                     dots[i].update(mapp)
-                    dots[i].action()
-                    d = dots[i].moved
+                    let a = dots[i].action()
+                    let d = dots[i].moved
                     dots[i].draw(GRID)
                     if (d != 4) {
                         mapp[dots[i].pos.y][dots[i].pos.x] = 0
@@ -86,15 +86,34 @@
                         dots[i].pos.y = m[1]
                         dots[i].dir = dots[i].moved
                     }
+                    switch (a) {
+                        case 0:
+                            break;
+                        case 1:
+                            m = checkmove(mapp, dots[i].pos.x, dots[i].pos.y, dots[i].dir)
+                            if (m[0] != dots[i].pos.x || m[1] != dots[i].pos.y) {
+                                mapp[m[1]][m[0]] = 2
+                            }
+                            break;
+                        case 3:
+                            m = checkspace(mapp, dots[i].pos.x, dots[i].pos.y, dots[i].dir)
+                            if (m[2] == 2) {
+                                mapp[m[1]][m[0]] = 0
+                            }
+                            break;
+                    }
                 }
             }
-            frame ++
+            frame++
             fill(0)
             textSize(28)
             text(slider.value() + 1, 650, 700)
             text(`Frame: ${frame}`, 10, 633)
             text(`Creatures alive: ${dts}`, 10, 666)
             text(`Plants alive: ${p}`, 10, 700)
+            // console.log(dots[pv].r, dots[pv].g, dots[pv].b)
+            fill(dots[pv].r, dots[pv].g, dots[pv].b)
+            rect(700, 675, 25, 25)
         }
 
         function checkmove(m, x, y, dir) {
@@ -125,7 +144,38 @@
                 case 4:
                     break;
             }
-            return [x, y]
+            return [x, y, mapp[y][x]]
+        }
+
+        function checkspace(m, x, y, dir) {
+            //   3
+            //  2+0
+            //   1
+            switch (dir) {
+                case 0:
+                    if (x != mapp.length - 1) {
+                        x += 1
+                    }
+                    break;
+                case 1:
+                    if (y != mapp.length - 1) {
+                        y += 1
+                    }
+                    break;
+                case 2:
+                    if (x != 0) {
+                        x -= 1
+                    }
+                    break;
+                case 3:
+                    if (y != 0) {
+                        y -= 1
+                    }
+                    break;
+                case 4:
+                    break;
+            }
+            return [x, y, mapp[y][x]]
         }
     </script>
     <div id="status"></div>
