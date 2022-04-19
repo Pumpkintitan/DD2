@@ -25,6 +25,8 @@
         let mapp = []
         let pv = 0
         let frame = 0
+        const INOUT = 2
+        const HIDDEN = 1
         const DOTS = 100
         const GRID = 100
         const PLANTS = 100
@@ -33,15 +35,17 @@
         function setup() {
             createCanvas(1250, 1000)
             for (let i = 0; i < DOTS; i++) {
-                dots[i] = new Dot(16, Math.floor(Math.random() * GRID), Math.floor(Math.random() * GRID), 2, 0)
+                dots[i] = new Dot(INOUT, Math.floor(Math.random() * GRID), Math.floor(Math.random() * GRID), HIDDEN, 0)
                 mapp[dots[i].pos.y][dots[i].pos.x] = 1
             }
             frameRate(15)
         }
 
         let bigman = 0
+        let indexbig = 0
         let bs = 0
-        let pbs = 1
+        let pspe = "r"
+        let spe = ""
         function draw() {
             background(255)
             noStroke()
@@ -63,8 +67,16 @@
                 }
             }
             let scores = []
+            let species = []
+            let exdot = []
             for (let i = 0; i < dots.length; i++) {
-                scores.push(dots[i].score())
+                if (species.includes(dots[i].genome.s)) {
+                    scores[species.indexOf(dots[i].genome.s)] += dots[i].score()
+                } else {
+                    species.push(dots[i].genome.s)
+                    scores.push(dots[i].score())
+                    exdot.push(i)
+                }
                 if (!dots[i].dead) {
                     dts++
                     dots[i].update(mapp)
@@ -107,34 +119,33 @@
                     }
                 }
             }
-            if (frame % 60 == 0) {
-                pbs = bs
-                bs = Math.max(...scores)
-                if (pbs != bs) {
-                    bigman = scores.indexOf(bs)
-                    dots[bigman].showbrain()
-                }
-                // console.log(dots[bigman].genome.decode())
-            }
-            if (frame == 0) {
-                dots[bigman].showbrain()
-            }
-            frame++
-            fill(0)
-            textSize(28)
-            text(`Showing brain of Dot ${bigman + 1}`, 650, 633)
-            text(`Color of Dot:`, 650, 666)
-            text(`Dot's score: ${bs.toFixed(3)}`, 650, 700)
-            text(`Dead?: ${dots[bigman].dead ? "Yes" : "No"}`, 650, 733)
-            text(`Dot's age: ${Math.floor(dots[bigman].data[0] * 1000)}`, 650, 766)
-            text(`Frame: ${frame}`, 10, 633)
-            text(`Dots alive: ${dts}`, 10, 666)
-            text(`Plants alive: ${p}`, 10, 700)
-            // console.log(dots[pv].r, dots[pv].g, dots[pv].b)
-            fill(dots[bigman].r, dots[bigman].g, dots[bigman].b)
-            rect(815, 646, 25, 25)
             if (dts == 0) {
                 reset()
+            } else {
+
+                pspe = spe
+                bs = Math.max(...scores)
+                bigman = scores.indexOf(bs)
+                spe = species[bigman].substring(0, 17)
+                if (pspe != spe) {
+                    indexbig = exdot[bigman]
+                    dots[indexbig].showbrain()
+                }
+                // console.log(dots[bigman].genome.decode())
+
+                frame++
+                fill(0)
+                textSize(28)
+                text(`Showing brain of best species:`, 650, 633)
+                text(spe, 650, 666)
+                text(`Color of Species:`, 650, 700)
+                text(`Species combined score: ${bs.toFixed(3)}`, 650, 733)
+                text(`Frame: ${frame}`, 10, 633)
+                text(`Dots alive: ${dts}`, 10, 666)
+                text(`Plants alive: ${p}`, 10, 700)
+                // console.log(dots[pv].r, dots[pv].g, dots[pv].b)
+                fill(dots[indexbig].r, dots[indexbig].g, dots[indexbig].b)
+                rect(865, 679, 25, 25)
             }
         }
 
@@ -143,7 +154,7 @@
             frame = 0
             dots = []
             for (let i = 0; i < DOTS; i++) {
-                dots[i] = new Dot(16, Math.floor(Math.random() * GRID), Math.floor(Math.random() * GRID), 2, 0)
+                dots[i] = new Dot(INOUT, Math.floor(Math.random() * GRID), Math.floor(Math.random() * GRID), HIDDEN, 0)
                 mapp[dots[i].pos.y][dots[i].pos.x] = 1
             }
         }
