@@ -8,8 +8,8 @@ class Brain {
         let hidd = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         let out = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         // input to hidden or output
-        for (let i = 0; i < this.d.length; i++){
-            if (this.d[i][0] == 0){
+        for (let i = 0; i < this.d.length; i++) {
+            if (this.d[i][0] == 0) {
                 if (this.d[i][2] == 1) {
                     hidd[this.d[i][3] % this.h] += (this.d[i][4] * data[this.d[i][1] % 20])
                 } else {
@@ -19,27 +19,27 @@ class Brain {
         }
 
         // hidden to hidden
-        for (let i = 0; i < this.d.length; i++){
-            if (this.d[i][0] == 1){
+        for (let i = 0; i < this.d.length; i++) {
+            if (this.d[i][0] == 1) {
                 if (this.d[i][2] == 1) {
                     hidd[this.d[i][3] % this.h] += (this.d[i][4] * hidd[this.d[i][1] % this.h])
-                } 
+                }
             }
         }
 
         // hidden to output
-        for (let i = 0; i < this.d.length; i++){
-            if (this.d[i][0] == 1){
+        for (let i = 0; i < this.d.length; i++) {
+            if (this.d[i][0] == 1) {
                 hidd[this.d[i][1] % this.h] = Math.tanh(hidd[this.d[i][1] % this.h])
                 if (this.d[i][2] == 0) {
                     out[this.d[i][3] % 14] += (this.d[i][4] * hidd[this.d[i][1] % this.h])
-                } 
+                }
             }
         }
 
         // tanh all the output values
         let nzero = []
-        for (let i = 0; i < 13; i++){
+        for (let i = 0; i < 13; i++) {
             out[i] = Math.tanh(out[i])
             if (out[i] != 0) {
                 nzero.push(out[i])
@@ -96,6 +96,7 @@ class Brain {
             { id: 44, group: 'out', label: 'Eat' }, //Eat plant forwards
         ]
 
+        // console.log(this.d)
         var nodes = new vis.DataSet([]);
         var ee = []
         for (let i = 0; i < this.d.length; i++) {

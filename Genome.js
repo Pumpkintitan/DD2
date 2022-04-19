@@ -69,22 +69,31 @@ class Genome {
 
 
     mutate(r) {
+        let ss = (' ' + this.s).slice(1)
+        let saa = []
+        let gg = new Genome
         if (Math.random() < r) {
             let go = true
             while (go) {
-                let i = Math.floor(Math.random() * this.s.length)
-                if (this.s[i] != " ") {
+                let i = Math.floor(Math.random() * ss.length)
+                if (ss[i] != " ") {
                     go = false
                     let n = hexs[Math.floor(Math.random() * hexs.length)]
-                    while (n == this.s[i]) {
+                    while (n == ss[i]) {
                         n = hexs[Math.floor(Math.random() * hexs.length)]
                     }
-                    this.s = this.s.substring(0, i) + n + this.s.substring(i + 1)
+                    ss = ss.substring(0, i) + n + ss.substring(i + 1)
                 }
             }
-            for (let w of this.s.split(" ")) {
-                this.sa.push(hex2bin(w))
+            for (let w of ss.split(" ")) {
+                saa.push(hex2bin(w))
             }
+            gg.sa = saa
+            gg.s = ss
+        } else {
+            gg.sa = this.sa
+            gg.s = this.s
         }
+        return gg
     }
 }

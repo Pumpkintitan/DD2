@@ -1,8 +1,29 @@
 class Dot {
-    constructor(glength, sx, sy, h) {
+    constructor(glength, sx, sy, h, g) {
+        this.gl = glength
+        this.hid = h
         this.dead = false
-        this.genome = new Genome()
-        this.genome.generate(glength)
+        if (g == 0) {
+            this.genome = new Genome()
+            this.genome.generate(glength)
+            this.brain = new Brain(this.genome.decode(), h)
+            let s = this.genome.s.replace(/\s/g, "")
+            let l = Math.round(s.length / 3)
+            let l2 = Math.round(2 * s.length / 3)
+            this.r = (parseInt(s.substring(0, l), 16) % 150) + 50
+            this.g = (parseInt(s.substring(l, l2), 16) % 150) + 50
+            this.b = (parseInt(s.substring(l2, s.length), 16) % 150) + 50
+        } else {
+            this.genome = g
+            this.brain = new Brain(g.decode(), h)
+            let s = g.s.replace(/\s/g, "")
+            let l = Math.round(s.length / 3)
+            let l2 = Math.round(2 * s.length / 3)
+            this.r = (parseInt(s.substring(0, l), 16) % 150) + 50
+            this.g = (parseInt(s.substring(l, l2), 16) % 150) + 50
+            this.b = (parseInt(s.substring(l2, s.length), 16) % 150) + 50
+        }
+        this.period = Math.random() * 2 - 1
         this.pos = createVector(sx, sy)
         this.lposx = 0
         this.lposy = 0
@@ -10,20 +31,23 @@ class Dot {
         this.lenergy = 0
         this.dir = 3
         this.moved = 4
-        this.brain = new Brain(this.genome.decode(), h)
-        this.period = Math.random() * 2 - 1
-        let s = this.genome.s.replace(/\s/g, "")
-        let l = Math.round(s.length / 3)
-        let l2 = Math.round(2 * s.length / 3)
-        this.r = (parseInt(s.substring(0, l), 16) % 150) + 50
-        this.g = (parseInt(s.substring(l, l2), 16) % 150) + 50
-        this.b = (parseInt(s.substring(l2, s.length), 16) % 150) + 50
+        this.records = [0, 0, 0] // spawned, planted, eaten
         this.data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     }
 
     draw(G) {
         fill(this.r, this.g, this.b)
         ellipse(this.pos.x * ((100 / G) * 6) + ((100 / G) * 3), this.pos.y * ((100 / G) * 6) + ((100 / G) * 3), ((100 / G) * 6))
+    }
+
+    spawn(x, y) {
+        let D = new Dot(this.gl, x, y, this.hid, this.genome.mutate(0.005))
+        return D
+    }
+
+    score() {
+        let a = (this.data[0] * 1000)
+        return (((a * a) + (this.records[1] * this.records[1])) * (this.records[0] / 2)) / 1000
     }
 
     action() {
@@ -74,17 +98,18 @@ class Dot {
                 this.energy--
                 return 0
             case 10: //Plt
+                this.records[1]++
                 this.energy--
                 return 1
             case 11: //NON
                 return 0
             case 12: //Spn
-                console.log("spawn")
+                this.records[0]++
                 this.energy -= 50
                 return 2
             case 13: //Eat
+                this.records[2]++
                 this.energy += 20
-                console.log("eat plant")
                 return 3
 
         }

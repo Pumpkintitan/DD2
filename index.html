@@ -25,37 +25,24 @@
         let mapp = []
         let pv = 0
         let frame = 0
-        const DOTS = 1
-        const GRID = 10
+        const DOTS = 100
+        const GRID = 100
         const PLANTS = 100
-        for (let i = 0; i < GRID; i++) {
-            mapp[i] = []
-            for (let j = 0; j < GRID; j++) {
-                mapp[i].push(0)
-            }
-        }
-        for (let i = 0; i < PLANTS; i++) {
-            mapp[Math.floor(Math.random() * GRID)][Math.floor(Math.random() * GRID)] = 2
-        }
+        board()
 
         function setup() {
-            createCanvas(1250, 700)
-            slider = createSlider(0, DOTS - 1, 0);
-            slider.position(650, 620);
-            slider.style('width', '600px');
+            createCanvas(1250, 1000)
             for (let i = 0; i < DOTS; i++) {
-                dots[i] = new Dot(16, Math.floor(Math.random() * GRID), Math.floor(Math.random() * GRID), 1)
+                dots[i] = new Dot(16, Math.floor(Math.random() * GRID), Math.floor(Math.random() * GRID), 2, 0)
                 mapp[dots[i].pos.y][dots[i].pos.x] = 1
             }
-            dots[0].showbrain()
             frameRate(15)
         }
 
+        let bigman = 0
+        let bs = 0
+        let pbs = 1
         function draw() {
-            if (pv != slider.value()) {
-                dots[slider.value()].showbrain()
-                pv = slider.value()
-            }
             background(255)
             noStroke()
             fill(225)
@@ -64,14 +51,20 @@
             let p = 0
             for (let i = 0; i < GRID; i++) {
                 for (let j = 0; j < GRID; j++) {
-                    if (mapp[i][j] == 2) {
+                    if (mapp[i][j] >= 2) {
                         p++
-                        fill(0, 100, 0)
+                        let co = mapp[i][j] - 2
+                        fill((18 * co), 100 + (18 * co), (18 * co))
                         rect(j * ((100 / GRID) * 6), i * ((100 / GRID) * 6), ((100 / GRID) * 6), ((100 / GRID) * 6))
+                        if (co > 0) {
+                            mapp[i][j]--
+                        }
                     }
                 }
             }
+            let scores = []
             for (let i = 0; i < dots.length; i++) {
+                scores.push(dots[i].score())
                 if (!dots[i].dead) {
                     dts++
                     dots[i].update(mapp)
@@ -89,13 +82,23 @@
                     switch (a) {
                         case 0:
                             break;
-                        case 1:
+                        case 1: // plant
                             m = checkmove(mapp, dots[i].pos.x, dots[i].pos.y, dots[i].dir)
                             if (m[0] != dots[i].pos.x || m[1] != dots[i].pos.y) {
-                                mapp[m[1]][m[0]] = 2
+                                mapp[m[1]][m[0]] = 10
                             }
                             break;
-                        case 3:
+
+                        case 2: // spawn
+                            m = checkmove(mapp, dots[i].pos.x, dots[i].pos.y, Math.floor(Math.random() * 4))
+                            if (m[0] != dots[i].pos.x || m[1] != dots[i].pos.y) {
+                                mapp[m[1]][m[0]] = 10
+                                dots.push(dots[i].spawn(m[0], m[1]))
+                                mapp[m[1]][m[0]] = 1
+                            }
+                            break;
+
+                        case 3: // eat
                             m = checkspace(mapp, dots[i].pos.x, dots[i].pos.y, dots[i].dir)
                             if (m[2] == 2) {
                                 mapp[m[1]][m[0]] = 0
@@ -104,16 +107,57 @@
                     }
                 }
             }
+            if (frame % 60 == 0) {
+                pbs = bs
+                bs = Math.max(...scores)
+                if (pbs != bs) {
+                    bigman = scores.indexOf(bs)
+                    dots[bigman].showbrain()
+                }
+                // console.log(dots[bigman].genome.decode())
+            }
+            if (frame == 0) {
+                dots[bigman].showbrain()
+            }
             frame++
             fill(0)
             textSize(28)
-            text(slider.value() + 1, 650, 700)
+            text(`Showing brain of Dot ${bigman + 1}`, 650, 633)
+            text(`Color of Dot:`, 650, 666)
+            text(`Dot's score: ${bs.toFixed(3)}`, 650, 700)
+            text(`Dead?: ${dots[bigman].dead ? "Yes" : "No"}`, 650, 733)
+            text(`Dot's age: ${Math.floor(dots[bigman].data[0] * 1000)}`, 650, 766)
             text(`Frame: ${frame}`, 10, 633)
-            text(`Creatures alive: ${dts}`, 10, 666)
+            text(`Dots alive: ${dts}`, 10, 666)
             text(`Plants alive: ${p}`, 10, 700)
             // console.log(dots[pv].r, dots[pv].g, dots[pv].b)
-            fill(dots[pv].r, dots[pv].g, dots[pv].b)
-            rect(700, 675, 25, 25)
+            fill(dots[bigman].r, dots[bigman].g, dots[bigman].b)
+            rect(815, 646, 25, 25)
+            if (dts == 0) {
+                reset()
+            }
+        }
+
+        function reset() {
+            board()
+            frame = 0
+            dots = []
+            for (let i = 0; i < DOTS; i++) {
+                dots[i] = new Dot(16, Math.floor(Math.random() * GRID), Math.floor(Math.random() * GRID), 2, 0)
+                mapp[dots[i].pos.y][dots[i].pos.x] = 1
+            }
+        }
+
+        function board() {
+            for (let i = 0; i < GRID; i++) {
+                mapp[i] = []
+                for (let j = 0; j < GRID; j++) {
+                    mapp[i].push(0)
+                }
+            }
+            for (let i = 0; i < PLANTS; i++) {
+                mapp[Math.floor(Math.random() * GRID)][Math.floor(Math.random() * GRID)] = 10
+            }
         }
 
         function checkmove(m, x, y, dir) {
@@ -144,7 +188,7 @@
                 case 4:
                     break;
             }
-            return [x, y, mapp[y][x]]
+            return [x, y]
         }
 
         function checkspace(m, x, y, dir) {
