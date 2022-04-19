@@ -25,8 +25,8 @@
         let mapp = []
         let pv = 0
         let frame = 0
-        const INOUT = 2
-        const HIDDEN = 1
+        const INOUT = 16
+        const HIDDEN = 3
         const DOTS = 100
         const GRID = 100
         const PLANTS = 100
@@ -69,6 +69,7 @@
             let scores = []
             let species = []
             let exdot = []
+            let newdots = []
             for (let i = 0; i < dots.length; i++) {
                 if (species.includes(dots[i].genome.s)) {
                     scores[species.indexOf(dots[i].genome.s)] += dots[i].score()
@@ -102,10 +103,10 @@
                             break;
 
                         case 2: // spawn
-                            m = checkmove(mapp, dots[i].pos.x, dots[i].pos.y, Math.floor(Math.random() * 4))
+                            m = checkmove(mapp, dots[i].pos.x, dots[i].pos.y, dots[i].dir)
                             if (m[0] != dots[i].pos.x || m[1] != dots[i].pos.y) {
                                 mapp[m[1]][m[0]] = 10
-                                dots.push(dots[i].spawn(m[0], m[1]))
+                                newdots.push(dots[i].spawn(m[0], m[1]))
                                 mapp[m[1]][m[0]] = 1
                             }
                             break;
@@ -119,6 +120,7 @@
                     }
                 }
             }
+            dots.push(...newdots)
             if (dts == 0) {
                 reset()
             } else {

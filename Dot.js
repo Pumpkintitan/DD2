@@ -29,7 +29,7 @@ class Dot {
         this.lposy = 0
         this.energy = 100
         this.lenergy = 0
-        this.dir = 3
+        this.dir = Math.floor(Math.random() * 4)
         this.moved = 4
         this.records = [0, 0, 0] // spawned, planted, eaten
         this.data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
