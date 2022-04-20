@@ -30,6 +30,7 @@
         const DOTS = 100
         const GRID = 100
         const PLANTS = 100
+        const SPECIES = false
         board()
 
         function setup() {
@@ -43,6 +44,7 @@
 
         let bigman = 0
         let indexbig = 0
+        let pbs = 0
         let bs = 0
         let pspe = "r"
         let spe = ""
@@ -67,6 +69,7 @@
                 }
             }
             let scores = []
+            let dscores = []
             let species = []
             let exdot = []
             let newdots = []
@@ -78,6 +81,7 @@
                     scores.push(dots[i].score())
                     exdot.push(i)
                 }
+                dscores.push(dots[i].score())
                 if (!dots[i].dead) {
                     dts++
                     dots[i].update(mapp)
@@ -124,30 +128,54 @@
             if (dts == 0) {
                 reset()
             } else {
-
-                pspe = spe
-                bs = Math.max(...scores)
-                bigman = scores.indexOf(bs)
-                spe = species[bigman].substring(0, 17)
-                if (pspe != spe) {
-                    indexbig = exdot[bigman]
-                    dots[indexbig].showbrain()
+                if (SPECIES) {
+                    pspe = spe
+                    bs = Math.max(...scores)
+                    bigman = scores.indexOf(bs)
+                    spe = species[bigman].substring(0, 17)
+                    if (pspe != spe) {
+                        indexbig = exdot[bigman]
+                        dots[indexbig].showbrain()
+                    }
+                    // console.log(dots[bigman].genome.decode())
+    
+                    frame++
+                    fill(0)
+                    textSize(28)
+                    text(`Showing brain of best species:`, 650, 633)
+                    text(spe, 650, 666)
+                    text(`Color of Species:`, 650, 700)
+                    text(`Species combined score: ${bs.toFixed(3)}`, 650, 733)
+                    // console.log(dots[pv].r, dots[pv].g, dots[pv].b)
+                    fill(dots[indexbig].r, dots[indexbig].g, dots[indexbig].b)
+                    rect(865, 679, 25, 25)
+                } else {
+                    pspe = spe
+                    pbs = bs
+                    bs = Math.max(...dscores)
+                    bigman = dscores.indexOf(bs)
+                    spe = dots[bigman].genome.s.substring(0, 17)
+                    if (pspe != spe) {
+                        dots[bigman].showbrain()
+                    }
+                    // console.log(dots[bigman].genome.decode())
+    
+                    frame++
+                    fill(0)
+                    textSize(28)
+                    text(`Showing brain of best dot:`, 650, 633)
+                    text(spe, 650, 666)
+                    text(`Color of dot:`, 650, 700)
+                    text(`Dot score: ${bs.toFixed(3)}`, 650, 733)
+                    text(`Dead? ${dots[bigman].dead ? "Yes" : "No"}`, 650, 766)
+                    // console.log(dots[pv].r, dots[pv].g, dots[pv].b)
+                    fill(dots[bigman].r, dots[bigman].g, dots[bigman].b)
+                    rect(810, 679, 25, 25)
                 }
-                // console.log(dots[bigman].genome.decode())
-
-                frame++
                 fill(0)
-                textSize(28)
-                text(`Showing brain of best species:`, 650, 633)
-                text(spe, 650, 666)
-                text(`Color of Species:`, 650, 700)
-                text(`Species combined score: ${bs.toFixed(3)}`, 650, 733)
                 text(`Frame: ${frame}`, 10, 633)
                 text(`Dots alive: ${dts}`, 10, 666)
                 text(`Plants alive: ${p}`, 10, 700)
-                // console.log(dots[pv].r, dots[pv].g, dots[pv].b)
-                fill(dots[indexbig].r, dots[indexbig].g, dots[indexbig].b)
-                rect(865, 679, 25, 25)
             }
         }
 
