@@ -47,7 +47,7 @@ class Dot {
 
     score() {
         let a = (this.data[0] * 1000)
-        return ((a * a) * (this.records[1] * this.records[1] + 1)) * ( (this.records[0] + 1)/ 4) / 1000
+        return ((a * a) * (this.records[1] * this.records[1] + 1)) * ((this.records[0] + 1) / 4) / 1000
     }
 
     action() {
@@ -104,12 +104,24 @@ class Dot {
             case 11: //NON
                 return 0
             case 12: //Spn
-                this.records[0]++
                 this.energy -= 50
-                return 2
+                if (this.energy <= -40) {
+                    this.energy = 0
+                    this.dead = true
+                    return 0
+                } else if (this.energy <= 0) {
+                    this.energy += 40
+                    return 0
+                } else {
+                    this.records[0]++
+                    return 2
+                }
             case 13: //Eat
                 this.records[2]++
                 this.energy += 20
+                if (this.energy > 100) {
+                    this.energy = 100
+                }
                 return 3
 
         }
@@ -119,10 +131,16 @@ class Dot {
         this.brain.show()
     }
 
-    update(mapp) {
+    checkdead() {
         if (this.energy <= 0) {
+            this.energy = 0
             this.dead = true
+            return true
         }
+        return false
+    }
+
+    update(mapp) {
         this.moved = 4
         this.data[0] += 0.001 //age
         this.data[1] = Math.random() * 2 - 1 //random

@@ -7,36 +7,45 @@ class Brain {
     getoutput(data) {
         let hidd = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         let out = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        // input to hidden or output
-        for (let i = 0; i < this.d.length; i++) {
-            if (this.d[i][0] == 0) {
-                if (this.d[i][2] == 1) {
-                    hidd[this.d[i][3] % this.h] += (this.d[i][4] * data[this.d[i][1] % 20])
-                } else {
+        if (this.h > 0) {
+            // input to hidden or output
+            for (let i = 0; i < this.d.length; i++) {
+                if (this.d[i][0] == 0) {
+                    if (this.d[i][2] == 1) {
+                        hidd[this.d[i][3] % this.h] += (this.d[i][4] * data[this.d[i][1] % 20])
+                    } else {
+                        out[this.d[i][3] % 14] += (this.d[i][4] * data[this.d[i][1] % 20])
+                    }
+                }
+            }
+
+            // hidden to hidden
+            for (let i = 0; i < this.d.length; i++) {
+                if (this.d[i][0] == 1) {
+                    if (this.d[i][2] == 1) {
+                        hidd[this.d[i][3] % this.h] += (this.d[i][4] * hidd[this.d[i][1] % this.h])
+                    }
+                }
+            }
+
+            // hidden to output
+            for (let i = 0; i < this.d.length; i++) {
+                if (this.d[i][0] == 1) {
+                    hidd[this.d[i][1] % this.h] = Math.tanh(hidd[this.d[i][1] % this.h])
+                    if (this.d[i][2] == 0) {
+                        out[this.d[i][3] % 14] += (this.d[i][4] * hidd[this.d[i][1] % this.h])
+                    }
+                }
+            }
+
+
+        } else {
+            for (let i = 0; i < this.d.length; i++) {
+                if (this.d[i][0] == 0) {
                     out[this.d[i][3] % 14] += (this.d[i][4] * data[this.d[i][1] % 20])
                 }
             }
         }
-
-        // hidden to hidden
-        for (let i = 0; i < this.d.length; i++) {
-            if (this.d[i][0] == 1) {
-                if (this.d[i][2] == 1) {
-                    hidd[this.d[i][3] % this.h] += (this.d[i][4] * hidd[this.d[i][1] % this.h])
-                }
-            }
-        }
-
-        // hidden to output
-        for (let i = 0; i < this.d.length; i++) {
-            if (this.d[i][0] == 1) {
-                hidd[this.d[i][1] % this.h] = Math.tanh(hidd[this.d[i][1] % this.h])
-                if (this.d[i][2] == 0) {
-                    out[this.d[i][3] % 14] += (this.d[i][4] * hidd[this.d[i][1] % this.h])
-                }
-            }
-        }
-
         // tanh all the output values
         let nzero = []
         for (let i = 0; i < 13; i++) {
@@ -99,26 +108,43 @@ class Brain {
         // console.log(this.d)
         var nodes = new vis.DataSet([]);
         var ee = []
-        for (let i = 0; i < this.d.length; i++) {
-            let ton = 0
-            let from = 0
-            if (this.d[i][0] == 1) {
-                from = (this.d[i][1] % this.h) + 20
-            } else {
+        if (this.h > 0) {
+            for (let i = 0; i < this.d.length; i++) {
+                let ton = 0
+                let from = 0
+                if (this.d[i][0] == 1) {
+                    from = (this.d[i][1] % this.h) + 20
+                } else {
+                    from = (this.d[i][1] % 20)
+                }
+                if (this.d[i][2] == 1) {
+                    ton = (this.d[i][3] % this.h) + 20
+                } else {
+                    ton = (this.d[i][3] % 14) + 30
+                }
+                nodes.update(pnodes[ton])
+                nodes.update(pnodes[from])
+                if (this.d[i][4] < 0) {
+                    ee.push(({ from: from + 1, to: ton + 1, color: "red", width: Math.abs(this.d[i][4]) }))
+                }
+                if (this.d[i][4] > 0) {
+                    ee.push(({ from: from + 1, to: ton + 1, color: "green", width: Math.abs(this.d[i][4]) }))
+                }
+            }
+        } else {
+            for (let i = 0; i < this.d.length; i++) {
+                let ton = 0
+                let from = 0
                 from = (this.d[i][1] % 20)
-            }
-            if (this.d[i][2] == 1) {
-                ton = (this.d[i][3] % this.h) + 20
-            } else {
                 ton = (this.d[i][3] % 14) + 30
-            }
-            nodes.update(pnodes[ton])
-            nodes.update(pnodes[from])
-            if (this.d[i][4] < 0) {
-                ee.push(({ from: from + 1, to: ton + 1, color: "red", width: Math.abs(this.d[i][4]) }))
-            }
-            if (this.d[i][4] > 0) {
-                ee.push(({ from: from + 1, to: ton + 1, color: "green", width: Math.abs(this.d[i][4]) }))
+                nodes.update(pnodes[ton])
+                nodes.update(pnodes[from])
+                if (this.d[i][4] < 0) {
+                    ee.push(({ from: from + 1, to: ton + 1, color: "red", width: Math.abs(this.d[i][4]) }))
+                }
+                if (this.d[i][4] > 0) {
+                    ee.push(({ from: from + 1, to: ton + 1, color: "green", width: Math.abs(this.d[i][4]) }))
+                }
             }
         }
         var edges = new vis.DataSet([]);

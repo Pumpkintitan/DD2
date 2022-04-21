@@ -26,7 +26,7 @@
         let pv = 0
         let frame = 0
         const INOUT = 16
-        const HIDDEN = 3
+        const HIDDEN = 2
         const DOTS = 100
         const GRID = 100
         const PLANTS = 100
@@ -112,6 +112,8 @@
                                 mapp[m[1]][m[0]] = 10
                                 newdots.push(dots[i].spawn(m[0], m[1]))
                                 mapp[m[1]][m[0]] = 1
+                            } else {
+                                dots[i].energy += 40
                             }
                             break;
 
@@ -122,6 +124,10 @@
                             }
                             break;
                     }
+                    if (dots[i].checkdead()) {
+                        mapp[dots[i].pos.y][dots[i].pos.x] = 0
+                    }
+
                 }
             }
             dots.push(...newdots)
@@ -138,7 +144,7 @@
                         dots[indexbig].showbrain()
                     }
                     // console.log(dots[bigman].genome.decode())
-    
+
                     frame++
                     fill(0)
                     textSize(28)
@@ -159,7 +165,7 @@
                         dots[bigman].showbrain()
                     }
                     // console.log(dots[bigman].genome.decode())
-    
+
                     frame++
                     fill(0)
                     textSize(28)
