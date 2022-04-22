@@ -47,7 +47,7 @@ class Dot {
 
     score() {
         let a = (this.data[0] * 1000)
-        return ((a * a) * (this.records[1] * this.records[1] + 1)) * ((this.records[0] + 1) / 4) / 1000
+        return ((a * a) * ((this.records[1] + 1) * (this.records[2] + 1))) * ((this.records[0] + 0.5) / 4) / 1000
     }
 
     action() {

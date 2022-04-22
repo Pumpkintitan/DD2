@@ -25,7 +25,7 @@
         let mapp = []
         let pv = 0
         let frame = 0
-        const INOUT = 16
+        const INOUT = 8
         const HIDDEN = 2
         const DOTS = 100
         const GRID = 100
@@ -48,6 +48,11 @@
         let bs = 0
         let pspe = "r"
         let spe = ""
+        let scores = []
+        let dscores = []
+        let species = []
+        let exdot = []
+        let newdots = []
         function draw() {
             background(255)
             noStroke()
@@ -68,11 +73,11 @@
                     }
                 }
             }
-            let scores = []
-            let dscores = []
-            let species = []
-            let exdot = []
-            let newdots = []
+            scores = []
+            dscores = []
+            species = []
+            exdot = []
+            newdots = []
             for (let i = 0; i < dots.length; i++) {
                 if (species.includes(dots[i].genome.s)) {
                     scores[species.indexOf(dots[i].genome.s)] += dots[i].score()
@@ -133,6 +138,8 @@
             dots.push(...newdots)
             if (dts == 0) {
                 reset()
+            } else if (frame > 3000) {
+                reset()
             } else {
                 if (SPECIES) {
                     pspe = spe
@@ -190,9 +197,34 @@
             frame = 0
             dots = []
             for (let i = 0; i < DOTS; i++) {
-                dots[i] = new Dot(INOUT, Math.floor(Math.random() * GRID), Math.floor(Math.random() * GRID), HIDDEN, 0)
+                let sss = pickChamp()
+                let g = new Genome
+                g.s = sss
+                g.getsa(sss)
+                let gg = g.mutate(0.3)
+                dots[i] = new Dot(INOUT, Math.floor(Math.random() * GRID), Math.floor(Math.random() * GRID), HIDDEN, gg)
                 mapp[dots[i].pos.y][dots[i].pos.x] = 1
             }
+        }
+
+        function genetic() {
+
+        }
+
+        function pickChamp() {
+            var totalscore = 0
+            var collectivescore = 0
+            for (var i = 0; i < scores.length; i++) {
+                totalscore += scores[i]
+            }
+            var randscore = Math.random() * totalscore
+            for (var i = 0; i < scores.length; i++) {
+                collectivescore += scores[i]
+                if (collectivescore > randscore) {
+                    return species[i]
+                }
+            }
+
         }
 
         function board() {

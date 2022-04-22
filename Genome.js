@@ -67,6 +67,12 @@ class Genome {
         }
     }
 
+    getsa(ss) {
+        for (let w of ss.split(" ")) {
+            this.sa.push(hex2bin(w))
+        }
+    }
+
 
     mutate(r) {
         let ss = (' ' + this.s).slice(1)
