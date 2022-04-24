@@ -132,6 +132,7 @@
             champscores = []
             pchamp = ""
             reset(false)
+            dots[0].showbrain()
         }
 
         let ex = 0
@@ -224,7 +225,7 @@
                             if (m[2] == 2) {
                                 mapp[m[1]][m[0]] = 0
                                 dots[i].records[2]++
-                                dots[i].energy += 20
+                                dots[i].energy += 15
                                 if (dots[i].energy > 100) {
                                     dots[i].energy = 100
                                 }
