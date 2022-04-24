@@ -25,23 +25,113 @@
         let mapp = []
         let pv = 0
         let frame = 0
-        const INOUT = 6
-        const HIDDEN = 3
-        const DOTS = 100
-        const GRID = 100
-        const PLANTS = 200
-        const SPECIES = false
-        const FPS = 15
-        const CHAMP = false
+        let INOUT = 8
+        let HIDDEN = 3
+        let DOTS = 100
+        let GRID = 100
+        let PLANTS = 200
+        let SPECIES = false
+        let FPS = 15
+        let A = 1
+        let P = 1
+        let E = 1
+        let S = 1
+        let nINOUT = 0
+        let nHIDDEN = 0
+        let nDOTS = 0
+        let nPLANTS = 0
+        let nGRID = 0
+        let nA = 0
+        let nP = 0
+        let nE = 0
+        let nS = 0
         board()
 
         function setup() {
-            createCanvas(1250, 1000)
+            createCanvas(1250, 1500)
             for (let i = 0; i < DOTS; i++) {
                 dots[i] = new Dot(INOUT, Math.floor(Math.random() * GRID), Math.floor(Math.random() * GRID), HIDDEN, 0, 100)
                 mapp[dots[i].pos.y][dots[i].pos.x] = 1
             }
-            frameRate(FPS)
+            sl1 = createSlider(15, 144, 15);
+            sl1.position(170, 920);
+            sl1.style('width', '200px');
+
+            button = createButton(`Switch`);
+            button.position(330, 972);
+            button.mousePressed(toggleNetwork);
+
+            sl2 = createSlider(1, 40, 8);
+            sl2.position(360, 1053);
+            sl2.style('width', '200px');
+
+            sl3 = createSlider(0, 10, 3);
+            sl3.position(360, 1086);
+            sl3.style('width', '200px');
+
+            sl4 = createSlider(50, 300, 100);
+            sl4.position(360, 1120);
+            sl4.style('width', '200px');
+
+            sl5 = createSlider(50, 400, 150);
+            sl5.position(360, 1153);
+            sl5.style('width', '200px');
+
+            sl6 = createSlider(50, 150, 100);
+            sl6.position(360, 1186);
+            sl6.style('width', '200px');
+
+            button = createButton('Reconfigure');
+            button.position(960, 1010);
+            button.mousePressed(changeSettings);
+
+            sl7 = createSlider(0, 2, 1, 0.1);
+            sl7.position(810, 1086);
+            sl7.style('width', '200px');
+
+            sl8 = createSlider(0, 3, 1, 0.1);
+            sl8.position(810, 1120);
+            sl8.style('width', '200px');
+
+            sl9 = createSlider(0, 3, 1, 0.1);
+            sl9.position(810, 1153);
+            sl9.style('width', '200px');
+
+            sl0 = createSlider(0, 3, 1, 0.1);
+            sl0.position(810, 1186);
+            sl0.style('width', '200px');
+            frameRate(15)
+        }
+
+        function toggleNetwork() {
+            SPECIES = !SPECIES
+        }
+
+        function changeSettings() {
+            INOUT = nINOUT
+            HIDDEN = nHIDDEN
+            DOTS = nDOTS
+            GRID = nGRID
+            PLANTS = nPLANTS
+            A = nA
+            P = nP
+            E = nE
+            S = nS
+            ex = 0
+            bigman = 0
+            indexbig = 0
+            pbs = 0
+            bs = 0
+            pspe = "r"
+            spe = ""
+            scores = []
+            dscores = []
+            species = []
+            exdot = []
+            newdots = []
+            champscores = []
+            pchamp = ""
+            reset(false)
         }
 
         let ex = 0
@@ -86,15 +176,15 @@
             let dcounts = []
             for (let i = 0; i < dots.length; i++) {
                 if (species.includes(dots[i].genome.s)) {
-                    scores[species.indexOf(dots[i].genome.s)] += dots[i].score()
+                    scores[species.indexOf(dots[i].genome.s)] += dots[i].score(A, P, E, S)
                     dcounts[species.indexOf(dots[i].genome.s)]++
                 } else {
                     species.push(dots[i].genome.s)
-                    scores.push(dots[i].score())
+                    scores.push(dots[i].score(A, P, E, S))
                     exdot.push(i)
                     dcounts.push(1)
                 }
-                dscores.push(dots[i].score())
+                dscores.push(dots[i].score(A, P, E, S))
                 if (!dots[i].dead) {
                     dts++
                     dots[i].update(mapp)
@@ -150,137 +240,163 @@
             }
             dots.push(...newdots)
             if (dts == 0) {
-                reset()
+                reset(true)
             } else if (frame > 3000) {
-                reset()
-            } else {
-                fill(0)
-                textSize(28)
-                frame++
-                if (SPECIES) {
-                    pspe = spe
-                    bs = Math.max(...scores)
-                    bigman = scores.indexOf(bs)
-                    spe = species[bigman].substring(0, 17)
-                    if (pspe != spe) {
-                        indexbig = exdot[bigman]
-                        if (FPS < 60) {
-                            dots[indexbig].showbrain()
-
-                        }
-                    }
-                    // console.log(dots[bigman].genome.decode())
-
-                    text(`Showing brain of best species:`, 750, 633)
-                    text(spe, 750, 666)
-                    text(`Color of Species:`, 750, 700)
-                    text(`Species combined score: ${bs.toFixed(3)}`, 750, 733)
-                    text(`Total dots in species: ${dcounts[bigman]}`, 750, 766)
-                    // console.log(dots[pv].r, dots[pv].g, dots[pv].b)
-                    fill(dots[indexbig].r, dots[indexbig].g, dots[indexbig].b)
-                    rect(965, 679, 25, 25)
-                } else if (CHAMP) {
-                    if (pchamp != dots[0].genome.s){
-                        dots[0].showbrain()
-
-                    }
-                    // console.log(dots[bigman].genome.decode())
-
-                    text(`Showing brain of best dot:`, 750, 633)
-                    text(dots[0].genome.s, 750, 666)
-                    text(`Color of dot:`, 750, 700)
-                    text(`Dot score: ${dots[0].score().toFixed(3)}`, 750, 733)
-                    if (ex > 0) {
-                        text(`Previous score: ${champscores[champscores.length-1].toFixed(3)}`, 750, 799)
-                    }
-                    text(`Dead? ${dots[0].dead ? "Yes" : "No"}`, 750, 766)
-                    // console.log(dots[pv].r, dots[pv].g, dots[pv].b)
-                    fill(dots[0].r, dots[0].g, dots[0].b)
-                    rect(910, 679, 25, 25)
-                } else {
-                    pspe = spe
-                    pbs = bs
-                    bs = Math.max(...dscores)
-                    bigman = dscores.indexOf(bs)
-                    spe = dots[bigman].genome.s.substring(0, 17)
-                    if (pspe != spe && FPS < 60) {
-                        dots[bigman].showbrain()
-                    }
-                    // console.log(dots[bigman].genome.decode())
-
-                    text(`Showing brain of best dot:`, 750, 633)
-                    text(spe, 750, 666)
-                    text(`Color of dot:`, 750, 700)
-                    text(`Dot score: ${bs.toFixed(3)}`, 750, 733)
-                    text(`Dead? ${dots[bigman].dead ? "Yes" : "No"}`, 750, 766)
-                    // console.log(dots[pv].r, dots[pv].g, dots[pv].b)
-                    fill(dots[bigman].r, dots[bigman].g, dots[bigman].b)
-                    rect(910, 679, 25, 25)
-                }
-                fill(0)
-                text(`Frame: ${frame}`, 10, 633)
-                text(`Dots alive: ${dts}`, 10, 666)
-                text(`Plants alive: ${p}`, 10, 700)
-                text(`Unique species: ${species.length}`, 10, 733)
-                text(`Extinctions: ${ex}`, 10, 766)
-
-                fill(255)
-                stroke(3)
-                rect(300, 620, 400, 200)
-                noStroke()
-                if (ex > 0) {
-                    let bbig = Math.max(...champscores) * 1.2
-                    let small =  Math.min(...champscores) * 0.9
-                    let range = bbig - small
-                    for (let i = 0; i < champscores.length; i++) {
-                        if (i == 0) {
-                            fill(0)
-                            stroke(0)
-                        } else if (champscores[i] > champscores[i-1]) {
-                            fill(0,200,0)
-                            stroke(0,200,0)
-                        } else if (champscores[i] < champscores[i-1]) {
-                            fill(200,0,0)
-                            stroke(200,0,0)
-                        } else {
-                            fill(0)
-                            stroke(0)
-                        }
-                        if (i > 0) {
-                            line(((i)/(champscores.length+1)) * 400 + 300, 620 + 175 * ((bbig - champscores[i-1])/range), ((i+1)/(champscores.length+1)) * 400 + 300, 620 + 175 * ((bbig - champscores[i])/range))
-                        }
-                        if (champscores.length < 100) {
-                            ellipse(((i+1)/(champscores.length+1)) * 400 + 300, 620 + 175 * ((bbig - champscores[i])/range), 3, 3)
-                        }
-                    }
-                    noStroke()
-                    fill(0)
-                    textSize(15)
-                    text(bbig.toFixed(3), 305, 640)
-                    text(small.toFixed(3), 305, 810)
-                }
+                reset(true)
             }
+            fill(0)
+            textSize(28)
+            frame++
+            if (SPECIES) {
+                pspe = spe
+                bs = Math.max(...scores)
+                bigman = scores.indexOf(bs)
+                spe = species[bigman].substring(0, 17)
+                if (pspe != spe) {
+                    indexbig = exdot[bigman]
+                    if (FPS < 60) {
+                        dots[indexbig].showbrain()
+
+                    }
+                }
+                // console.log(dots[bigman].genome.decode())
+
+                text(`Showing brain of best species:`, 750, 633)
+                text(spe, 750, 666)
+                text(`Color of Species:`, 750, 700)
+                text(`Species combined score: ${bs.toFixed(3)}`, 750, 733)
+                text(`Total dots in species: ${dcounts[bigman]}`, 750, 766)
+                // console.log(dots[pv].r, dots[pv].g, dots[pv].b)
+                fill(dots[indexbig].r, dots[indexbig].g, dots[indexbig].b)
+                rect(965, 679, 25, 25)
+            } else {
+                pspe = spe
+                pbs = bs
+                bs = Math.max(...dscores)
+                bigman = dscores.indexOf(bs)
+                spe = dots[bigman].genome.s.substring(0, 17)
+                if (pspe != spe && FPS < 60) {
+                    dots[bigman].showbrain()
+                }
+                // console.log(dots[bigman].genome.decode())
+
+                text(`Showing brain of best dot:`, 750, 633)
+                text(spe, 750, 666)
+                text(`Color of dot:`, 750, 700)
+                text(`Dot score: ${bs.toFixed(3)}`, 750, 733)
+                text(`Dead? ${dots[bigman].dead ? "Yes" : "No"}`, 750, 766)
+                // console.log(dots[pv].r, dots[pv].g, dots[pv].b)
+                fill(dots[bigman].r, dots[bigman].g, dots[bigman].b)
+                rect(910, 679, 25, 25)
+            }
+            fill(0)
+            text(`Frame: ${frame}`, 10, 633)
+            text(`Dots alive: ${dts}`, 10, 666)
+            text(`Plants alive: ${p}`, 10, 700)
+            text(`Unique species: ${species.length}`, 10, 733)
+            text(`Extinctions: ${ex}`, 10, 766)
+
+            fill(255)
+            stroke(3)
+            rect(300, 620, 400, 200)
+            noStroke()
+            if (ex > 0) {
+                let bbig = Math.max(...champscores) * 1.2
+                let small = Math.min(...champscores) * 0.9
+                let range = bbig - small
+                for (let i = 0; i < champscores.length; i++) {
+                    if (i == 0) {
+                        fill(0)
+                        stroke(0)
+                    } else if (champscores[i] > champscores[i - 1]) {
+                        fill(0, 200, 0)
+                        stroke(0, 200, 0)
+                    } else if (champscores[i] < champscores[i - 1]) {
+                        fill(200, 0, 0)
+                        stroke(200, 0, 0)
+                    } else {
+                        fill(0)
+                        stroke(0)
+                    }
+                    if (i > 0) {
+                        line(((i) / (champscores.length + 1)) * 400 + 300, 620 + 175 * ((bbig - champscores[i - 1]) / range), ((i + 1) / (champscores.length + 1)) * 400 + 300, 620 + 175 * ((bbig - champscores[i]) / range))
+                    }
+                    if (champscores.length < 100) {
+                        ellipse(((i + 1) / (champscores.length + 1)) * 400 + 300, 620 + 175 * ((bbig - champscores[i]) / range), 3, 3)
+                    }
+                }
+                noStroke()
+                fill(0)
+                textSize(15)
+                text(bbig.toFixed(3), 305, 640)
+                text(small.toFixed(3), 305, 810)
+            }
+
+
+            FPS = sl1.value()
+            nINOUT = sl2.value()
+            nHIDDEN = sl3.value()
+            nDOTS = sl4.value()
+            nPLANTS = sl5.value()
+            nGRID = sl6.value()
+            nA = sl7.value()
+            nP = sl8.value()
+            nE = sl9.value()
+            nS = sl0.value()
+            frameRate(FPS)
+            noStroke()
+            fill(0)
+            textSize(45)
+            text("Simulation Settings:", 10, 900)
+            textSize(28)
+            text(`FPS: ${FPS}`, 30, 933)
+            textSize(14)
+            text("Network will stop updating when FPS is over 60 for preformance purposes", 30, 950)
+            textSize(28)
+            text(`Network View: ${SPECIES ? "Species" : "Dot"}`, 30, 983)
+            textSize(36)
+            text(`To apply the following settings, click the reconfigure button:`, 10, 1023)
+            textSize(28)
+            text(`Network Connections: ${nINOUT}`, 30, 1066)
+            text(`Hidden Nodes: ${nHIDDEN}`, 30, 1100)
+            text(`Starting Dots: ${nDOTS}`, 30, 1133)
+            text(`Starting Plants: ${nPLANTS}`, 30, 1166)
+            text(`Grid Size: ${nGRID}`, 30, 1200)
+            // #
+            text(`Scoring Attributes (Var ^ n):`, 600, 1066)
+            text(`Age, n=${nA}`, 600, 1100)
+            text(`Planted, n=${nP}`, 600, 1133)
+            text(`Eaten, n=${nE}`, 600, 1166)
+            text(`Spawned, n=${nS}`, 600, 1200)
         }
 
-        function reset() {
+        function reset(v) {
             board()
             frame = 0
-            let ii = dscores.indexOf(Math.max(...dscores))
-            pchamp = dots[0].genome.s
-            let champ = dots[ii].clone()
-            console.log((dots[ii].data[0] * 1000).toFixed(), dots[ii].records, Math.max(...dscores))
-            champscores.push(Math.max(...dscores))
-            dots = []
-            dots.push(champ)
-            ex++
-            for (let i = 1; i < DOTS - 1; i++) {
-                let sss = pickChamp()
-                let g = new Genome
-                g.s = sss
-                g.getsa(sss)
-                let gg = g.mutate(0.3)
-                dots[i] = new Dot(INOUT, Math.floor(Math.random() * GRID), Math.floor(Math.random() * GRID), HIDDEN, gg, 100)
-                mapp[dots[i].pos.y][dots[i].pos.x] = 1
+            if (v) {
+                let ii = dscores.indexOf(Math.max(...dscores))
+                pchamp = dots[0].genome.s
+                let champ = dots[ii].clone()
+                console.log((dots[ii].data[0] * 1000).toFixed(), dots[ii].records, Math.max(...dscores))
+                champscores.push(Math.max(...dscores))
+                dots = []
+                dots.push(champ)
+                ex++
+                for (let i = 1; i < DOTS - 1; i++) {
+                    let sss = pickChamp()
+                    let g = new Genome
+                    g.s = sss
+                    g.getsa(sss)
+                    let gg = g.mutate(0.3)
+                    dots[i] = new Dot(INOUT, Math.floor(Math.random() * GRID), Math.floor(Math.random() * GRID), HIDDEN, gg, 100)
+                    mapp[dots[i].pos.y][dots[i].pos.x] = 1
+                }
+            } else {
+                dots = []
+                for (let i = 0; i < DOTS; i++) {
+                    dots[i] = new Dot(INOUT, Math.floor(Math.random() * GRID), Math.floor(Math.random() * GRID), HIDDEN, 0, 100)
+                    mapp[dots[i].pos.y][dots[i].pos.x] = 1
+                }
             }
         }
 
@@ -318,12 +434,12 @@
             //   1
             switch (dir) {
                 case 0:
-                    if (x != mapp.length - 1 && mapp[y][x + 1] == 0) {
+                    if (x != GRID - 1 && mapp[y][x + 1] == 0) {
                         x += 1
                     }
                     break;
                 case 1:
-                    if (y != mapp.length - 1 && mapp[y + 1][x] == 0) {
+                    if (y != GRID - 1 && mapp[y + 1][x] == 0) {
                         y += 1
                     }
                     break;
@@ -349,12 +465,12 @@
             //   1
             switch (dir) {
                 case 0:
-                    if (x != mapp.length - 1) {
+                    if (x != GRID - 1) {
                         x += 1
                     }
                     break;
                 case 1:
-                    if (y != mapp.length - 1) {
+                    if (y != GRID - 1) {
                         y += 1
                     }
                     break;

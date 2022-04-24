@@ -50,13 +50,13 @@ class Dot {
         return D
     }
 
-    score(ss) {
+    score(aa,pp,ee,ss) {
         let a = (this.data[0] * 1000)
-        let A = (a * a)/ 1000 // ideal 1000
-        let P = this.records[1] * this.records[1]
-        let E = this.records[2] * this.records[2]
-        let S = this.records[0] + 1
-        return A + E + P + (5 * Math.tanh(this.records[3]/100)) + S
+        let A = Math.pow(a,aa)
+        let P = Math.pow(this.records[1] * 2,pp)
+        let E = Math.pow(this.records[2] * 2,ee)
+        let S = Math.pow(this.records[0] * 10,ss)
+        return A + E + P + S + this.records[3]/100
     }
 
     action() {
