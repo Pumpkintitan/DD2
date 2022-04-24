@@ -1,5 +1,5 @@
 class Dot {
-    constructor(glength, sx, sy, h, g) {
+    constructor(glength, sx, sy, h, g, e) {
         this.gl = glength
         this.hid = h
         this.dead = false
@@ -27,11 +27,11 @@ class Dot {
         this.pos = createVector(sx, sy)
         this.lposx = 0
         this.lposy = 0
-        this.energy = 100
+        this.energy = e
         this.lenergy = 0
         this.dir = Math.floor(Math.random() * 4)
         this.moved = 4
-        this.records = [0, 0, 0] // spawned, planted, eaten
+        this.records = [0, 0, 0, 0] // spawned, planted, eaten, attempted eat
         this.data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     }
 
@@ -41,17 +41,25 @@ class Dot {
     }
 
     spawn(x, y) {
-        let D = new Dot(this.gl, x, y, this.hid, this.genome.mutate(0.005))
+        let D = new Dot(this.gl, x, y, this.hid, this.genome.mutate(0.003), this.energy + 10)
         return D
     }
 
-    score() {
+    clone() {
+        let D = new Dot(this.gl, this.pos.x, this.pos.y, this.hid, this.genome, 100)
+        return D
+    }
+
+    score(ss) {
         let a = (this.data[0] * 1000)
-        return ((a * a) * ((this.records[1] + 1) * (this.records[2] + 1))) * ((this.records[0] + 0.5) / 4) / 1000
+        let A = (a * a)/ 1000 // ideal 1000
+        let P = this.records[1] * this.records[1]
+        let E = this.records[2] * this.records[2]
+        let S = this.records[0] + 1
+        return A + E + P + (5 * Math.tanh(this.records[3]/100)) + S
     }
 
     action() {
-        // console.log(this.data[17], this.data[12])
         this.lenergy = this.energy
         this.lposx = this.pos.x
         this.lposy = this.pos.y
@@ -98,30 +106,20 @@ class Dot {
                 this.energy--
                 return 0
             case 10: //Plt
-                this.records[1]++
                 this.energy--
                 return 1
             case 11: //NON
                 return 0
             case 12: //Spn
                 this.energy -= 50
-                if (this.energy <= -40) {
+                if (this.energy <= 0) {
                     this.energy = 0
                     this.dead = true
                     return 0
-                } else if (this.energy <= 0) {
-                    this.energy += 40
-                    return 0
                 } else {
-                    this.records[0]++
                     return 2
                 }
             case 13: //Eat
-                this.records[2]++
-                this.energy += 20
-                if (this.energy > 100) {
-                    this.energy = 100
-                }
                 return 3
 
         }
@@ -132,7 +130,7 @@ class Dot {
     }
 
     checkdead() {
-        if (this.energy <= 0) {
+        if (this.energy <= 0 || (this.data[0] * 1000) > 1000) {
             this.energy = 0
             this.dead = true
             return true
