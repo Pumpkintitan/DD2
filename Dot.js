@@ -56,7 +56,7 @@ class Dot {
         let P = Math.pow(this.records[1] * 2,pp)
         let E = Math.pow(this.records[2] * 2,ee)
         let S = Math.pow(this.records[0] * 10,ss)
-        return A + E + P + S + this.records[3]/100
+        return A + E + P + S + this.records[3]/100 + 0.1
     }
 
     action() {
